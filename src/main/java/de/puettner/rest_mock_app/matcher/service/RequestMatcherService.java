@@ -69,9 +69,9 @@ public class RequestMatcherService {
         for (MatcherConfiguration matcherConfig : matcherConfiguration) {
             matchResultMessage = "[" + matcherConfig.getName() + "]";
             for (RequestMatcher matcher : fullMatcherList) {
-                boolean matcherResult = matcher.matches(restRequest, matcherConfig);
-                matchResultMessage += " " + matcher.getCheckedElementName() + ": " + matcherResult + ",";
-                if (matcherResult) {
+                Optional<Boolean> matcherResult = matcher.matches(restRequest, matcherConfig);
+                if (matcherResult.isPresent() && matcherResult.get()) {
+                    matchResultMessage += " " + matcher.getCheckedElementName() + ": " + matcherResult + ",";
                     if (!positivMatcherList.contains(matcherConfig)) {
                         positivMatcherList.add(matcherConfig);
                     }

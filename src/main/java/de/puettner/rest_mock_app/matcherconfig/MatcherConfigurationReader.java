@@ -18,18 +18,20 @@ import java.util.regex.Pattern;
 @Component
 public class MatcherConfigurationReader {
 
-    @Value("${app.matcher.configuration.file}")
-    public String matchingConfigurationFilename;
+    private final String matchingConfigurationFilename;
 
-    @Value("${app.response.file.basedir}")
-    private String responseFileBaseDir;
+    private final String responseFileBaseDir;
 
     private final ObjectMapper om = new ObjectMapper();
 
     /**
      * C'tor
      */
-    public MatcherConfigurationReader() {
+    @Autowired
+    public MatcherConfigurationReader(@Value("${app.matcher.configuration.file}") String matchingConfigurationFilename,
+                                      @Value("${app.response.file.basedir}") String responseFileBaseDir) {
+        this.matchingConfigurationFilename = matchingConfigurationFilename;
+        this.responseFileBaseDir = responseFileBaseDir;
     }
 
     /**

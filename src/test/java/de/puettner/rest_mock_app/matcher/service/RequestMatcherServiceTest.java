@@ -33,7 +33,7 @@ public class RequestMatcherServiceTest {
     }
 
     @Test
-    public void findResponse() {
+    public void findResponseAssertDefaultResponse() {
         List<MatcherConfiguration> config = null;
         when(matcherConfigurationReader.createConfig()).thenReturn(config);
         RestRequest request = RestRequest.builder().build();
@@ -44,5 +44,10 @@ public class RequestMatcherServiceTest {
         assertThat(actualResult.getStatusCode()).isEqualTo(500);
         assertThat(actualResult.getFilename()).isNotNull();
         assertThat(actualResult.getFile()).isNull();
+    }
+
+    @Test
+    public void findResponse() {
+
     }
 }
