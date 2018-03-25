@@ -17,28 +17,40 @@ import java.util.Optional;
 
 @RestController
 @Slf4j
-public class DefaultRestController {
+public class AppRestController {
 
     private static final String PATH = "/**";
     private final RequestMatcherService matcher;
 
     @Autowired
-    public DefaultRestController(RequestMatcherService matcher) {
+    public AppRestController(RequestMatcherService matcher) {
         this.matcher = matcher;
     }
 
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.HEAD}, path = PATH)
-    public ResponseEntity<String> immutableRequest(HttpServletRequest request) {
-        log.debug("immutableRequest");
+    @RequestMapping(method = RequestMethod.GET, path = PATH)
+    public ResponseEntity<String> get(HttpServletRequest request) {
         return findMatchingResponse(request, null);
     }
 
-    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST, RequestMethod.DELETE}, path = PATH)
-    public ResponseEntity<String> nonImmutableRequest(@RequestBody String body, HttpServletRequest request) {
-        log.debug("nonImmutableRequest");
+    @RequestMapping(method = RequestMethod.HEAD, path = PATH)
+    public ResponseEntity<String> head(HttpServletRequest request) {
+        return findMatchingResponse(request, null);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, path = PATH)
+    public ResponseEntity<String> post(@RequestBody String body, HttpServletRequest request) {
         return findMatchingResponse(request, body);
     }
 
+    @RequestMapping(method = RequestMethod.PUT, path = PATH)
+    public ResponseEntity<String> put(@RequestBody String body, HttpServletRequest request) {
+        return findMatchingResponse(request, body);
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, path = PATH)
+    public ResponseEntity<String> delete(@RequestBody String body, HttpServletRequest request) {
+        return findMatchingResponse(request, body);
+    }
     
     private ResponseEntity<String> findMatchingResponse(HttpServletRequest request, String body) {
         log.info("Incoming request");
@@ -51,7 +63,7 @@ public class DefaultRestController {
 
         ResponseMatcherConfig result = matcher.findResponse(restRequest);
         
-        return ResponseEntity.status(result.getStatusCode()).body(result.getFilename());
+        return ResponseEntity.status(result.getStatusCode()).body(result.getBody().getContent());
     }
 
 }

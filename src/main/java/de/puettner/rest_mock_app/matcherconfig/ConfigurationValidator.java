@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.File;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class ConfigurationValidator {
 
@@ -31,11 +30,7 @@ public class ConfigurationValidator {
         }
     }
 
-    static Pattern validateRegEx(String pattern) {
-        return Pattern.compile(pattern);
-    }
-
-    static File validateFile(File file) {
+    public static File validateFile(File file) {
         if (!file.isFile()) {
             throw new AppException("File not found. file = " + file);
         }
@@ -59,18 +54,11 @@ public class ConfigurationValidator {
             if (item.getResponse() == null) {
                 throw new AppException("Invalid JSON : Empty response object");
             }
-            if (item.getRequest().getMethod() != null) {
-                validateHttpMethod(item.getRequest().getMethod().toString());
+            if (item.getRequest().getMethod() != null && item.getRequest().getMethod().isPlainExpression()) {
+                validateHttpMethod(item.getRequest().getMethod().getContent());
             }
             validateHttpStatusCode(item.getResponse().getStatusCode());
-            validateFile(item.getResponse().getFile());
-
-            if (item.getRequest().getBodyContains() != null) {
-                item.getRequest().setBodyContains(item.getRequest().getBodyContains().trim());
-                if (item.getRequest().getBodyContains().isEmpty()) {
-                    throw new AppException("Invalid JSON : Empty request.bodyContains");
-                }
-            }
+            item.getResponse().getBody().validate();
         }
     }
 }

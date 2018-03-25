@@ -9,9 +9,8 @@ import java.util.Optional;
 @Slf4j
 public class UrlMatcher implements RequestMatcher {
     public Optional<Boolean> matches(RestRequest restRequest, MatcherConfiguration matcherConfig) {
-        if (matcherConfig.getRequest().getUrlRegEx() != null) {
-            boolean matched = matcherConfig.getRequest().getUrlRegExMatchPattern().matcher(restRequest.getUrl()).matches();
-            log.debug("Matching '" + matcherConfig.getRequest().getUrlRegEx() + "' with '" + restRequest.getUrl() + "' ? " + matched);
+        if (matcherConfig.getRequest().getUrl() != null) {
+            boolean matched = matcherConfig.getRequest().getUrl().matches(restRequest.getUrl());
             return Optional.of(matched);
         }
         return Optional.empty();

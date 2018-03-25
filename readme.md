@@ -1,6 +1,6 @@
 
 # Rest Mock
-* This application allows you to mock HTTP responses
+* This application allows you to mock HTTP responses with a local http server
 * This project is based on Maven 3.3, Java 8 and Spring Boot, so before you can run this server you need to install and configure these tools
 
 ## Build and Start-up
@@ -16,14 +16,13 @@
     "name": "Login-Matcher",
     "description": "Define a mocked response for login requests",
     "request": {
-      "method": "POST", # If request with HTTP method is equal to 'POST'
-      "urlRegEx": "/v1/login.*" # ... and incomming URL is matching
-      "bodyRegEx": ".*", # ... and incomming body is matching
-      "bodyContains": "username" # ... and incoming body includes the string "username" ...
+      "method": "POST",             # If request with HTTP method is equal to 'POST'
+      "url": "regex::/v1/login.*"   # ... and incomming URL is matching
+      "body": ".*",                 # ... and incomming body is matching
     },
     "response": {
-      "statusCode": 200, # ... then return a HTTP Status code 200
-      "filename": "/api/login.json" # ... and return content of file as body
+      "statusCode": 200,              # ... then return a HTTP Status code 200
+      "body": "file::/api/login.json" # ... and return content of file as body
     }
   }
 ```

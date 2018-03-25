@@ -4,11 +4,11 @@
 	<groupId>de.puettner</groupId>
 	<artifactId>rest-mock-app</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>demo</name>
 	<url>http://maven.apache.org</url>
 
-	<description>Mock your REST requests.</description>
+	<description>Mock your REST requests with a local spring boot service.</description>
 
 	<properties>
 		<maven.build.timestamp.format>yyyy-MM-dd-HH:mm</maven.build.timestamp.format>
@@ -57,6 +57,16 @@
 			<artifactId>lombok</artifactId>
 			<version>1.16.20</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.7</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.5</version>
 		</dependency>
 	</dependencies>
 

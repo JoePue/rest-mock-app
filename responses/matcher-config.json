@@ -1,26 +1,49 @@
 [
   {
+    "name": "Header-Matcher",
+    "description": "Match a request by a header",
+    "request": {
+      "header": {"name": "myHeaderName", "value": "regex::.*myHeaderValue.*"}
+    },
+    "response": {
+      "statusCode": 200,
+      "body": "Header was found."
+    }
+  },
+  {
     "name": "Login-Matcher",
     "description": "Define a mocked response for login requests",
     "request": {
       "method": "POST",
-      "urlRegEx": "/v1/login.*",
-      "bodyRegEx": ".*",
-      "bodyContains": "username"
+      "url": "regex::/login.*",
+      "body": "regex::.*"
     },
     "response": {
       "statusCode": 200,
-      "filename": "/api/login.json"
+      "body": "file::/api/login.json"
+    }
+  },
+  {
+    "name": "Hello-Matcher",
+    "description": "Define a mocked response for hello requests, that exactly match the provided url",
+    "request": {
+      "method": "regex::^(POST|GET|PUT|DELETE|HEAD)$",
+      "url": "regex::/hello.*"
+    },
+    "response": {
+      "statusCode": 200,
+      "body": "REST Mock App says hello to you."
     }
   },
   {
     "name": "Default-Matcher",
     "description": "Default Matcher/Response",
     "request": {
+      "url": "regex::.*"
     },
     "response": {
       "statusCode": 200,
-      "filename": "/default.txt"
+      "body": "file::/default.txt"
     }
   }
 ]

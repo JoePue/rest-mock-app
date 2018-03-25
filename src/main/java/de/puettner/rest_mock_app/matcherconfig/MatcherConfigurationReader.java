@@ -4,16 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.puettner.rest_mock_app.exception.AppException;
 import de.puettner.rest_mock_app.matcherconfig.model.MatcherConfiguration;
+import de.puettner.rest_mock_app.matcherconfig.model.RequestMatcherConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Component
 public class MatcherConfigurationReader {
@@ -44,34 +41,11 @@ public class MatcherConfigurationReader {
             throw new AppException("responseFileDir is invalid");
         }
         ConfigurationValidator.validateDir(responseFileBaseDir);
-        return createMatcherConfiguration(responseFileBaseDir);
+        return createMatcherConfiguration();
     }
 
-    public String readResponseFile(String filename) {
-        File file = new File(responseFileBaseDir + File.separatorChar + filename);
-        StringBuilder fileContent = new StringBuilder();
-        readFile(file).forEach(s -> fileContent.append(s));
-        return fileContent.toString();
-    }
-
-    /**
-     * Datei einlesen
-     *
-     * @param file
-     * @return
-     */
-    private static List<String> readFile(File file) {
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(file.toPath(), Charset.forName("UTF-8"));
-        } catch (IOException e) {
-            throw new AppException(e.getMessage());
-        }
-        return lines;
-    }
-
-    public List<MatcherConfiguration> createMatcherConfiguration(String responseFileDir) {
-        File file = new File(responseFileDir + File.separator + matchingConfigurationFilename);
+    private List<MatcherConfiguration> createMatcherConfiguration() {
+        File file = new File(responseFileBaseDir + File.separator + matchingConfigurationFilename);
         ConfigurationValidator.validateFile(file);
         List<MatcherConfiguration> matcherConfiguration;
         try {
@@ -83,28 +57,33 @@ public class MatcherConfigurationReader {
             throw new AppException("Invalid JSON : Empty matcher object");
         }
         for (MatcherConfiguration configItem : matcherConfiguration) {
+            RequestMatcherConfig requestConfig = configItem.getRequest();
             if (configItem == null) {
                 throw new AppException("Invalid JSON : Empty matcher object");
             }
-            if (configItem.getRequest() == null) {
+            if (requestConfig == null) {
                 throw new AppException("Invalid JSON : Empty request object");
             }
             if (configItem.getResponse() == null) {
                 throw new AppException("Invalid JSON : Empty response object");
             }
+            if (configItem.getResponse().getBody() == null) {
+                throw new AppException("Invalid JSON : Empty response.body");
+            }
+            if (requestConfig.getHeader() != null && requestConfig.getHeader().getName() == null && requestConfig.getHeader().getValue()== null) {
+                throw new AppException("Invalid JSON : At the same time header name and header value can't be null.");
+            }
 
-            if (configItem.getRequest().getUrlRegEx() != null) {
-                configItem.getRequest().setUrlRegExMatchPattern(Pattern.compile(configItem.getRequest().getUrlRegEx()));
+            if (requestConfig.getUrl() != null) {
+                requestConfig.getUrl().init(responseFileBaseDir);
             }
-            if (configItem.getRequest().getBodyRegEx() != null) {
-                configItem.getRequest().setBodyRegExMatchPattern(Pattern.compile(configItem.getRequest().getBodyRegEx()));
+            if (requestConfig.getBody() != null) {
+                requestConfig.getBody().init(responseFileBaseDir);
             }
-
-            if (configItem.getResponse().getFilename() == null) {
-                throw new AppException("Invalid JSON : Empty response.filename");
+            if (requestConfig.getMethod() != null) {
+                requestConfig.getMethod().init(responseFileBaseDir);
             }
-            String absFilename = responseFileDir + File.separatorChar + configItem.getResponse().getFilename();
-            configItem.getResponse().setFile(new File(absFilename));
+            configItem.getResponse().getBody().init(responseFileBaseDir);
         }
         new ConfigurationValidator(matcherConfiguration).validate();
         return matcherConfiguration;

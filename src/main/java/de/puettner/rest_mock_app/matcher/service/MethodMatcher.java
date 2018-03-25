@@ -10,10 +10,8 @@ import java.util.Optional;
 public class MethodMatcher implements RequestMatcher {
     public Optional<Boolean> matches(RestRequest restRequest, MatcherConfiguration matcherConfig) {
         if (matcherConfig.getRequest().getMethod() != null) {
-            if (restRequest.getMethod().equals(matcherConfig.getRequest().getMethod())) {
-                return Optional.of(true);
-            }
-            return Optional.of(false);
+            boolean matched = matcherConfig.getRequest().getMethod().matches(restRequest.getMethod().toString());
+            return Optional.of(matched);
         }
         return Optional.empty();
     }

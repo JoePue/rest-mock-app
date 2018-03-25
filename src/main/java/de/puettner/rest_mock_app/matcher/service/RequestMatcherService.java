@@ -3,6 +3,7 @@ package de.puettner.rest_mock_app.matcher.service;
 import de.puettner.rest_mock_app.matcher.model.RestRequest;
 import de.puettner.rest_mock_app.matcherconfig.MatcherConfigurationReader;
 import de.puettner.rest_mock_app.matcherconfig.model.MatcherConfiguration;
+import de.puettner.rest_mock_app.matcherconfig.model.ResponseElementValueExpression;
 import de.puettner.rest_mock_app.matcherconfig.model.ResponseMatcherConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.Optional;
 @Slf4j
 public class RequestMatcherService {
 
-    private final ResponseMatcherConfig defaultResponse = new ResponseMatcherConfig(500, "No suitable matcher found.", null);
+    private final ResponseMatcherConfig defaultResponse = new ResponseMatcherConfig(500, new ResponseElementValueExpression("No suitable matcher found."));
     private final MatcherConfigurationReader matcherConfigurationReader;
 
     /**
@@ -34,19 +35,18 @@ public class RequestMatcherService {
      * @return Matching response for the request
      */
     public ResponseMatcherConfig findResponse(RestRequest restRequest) {
-        log.debug(MessageFormat.format("findResponse() ", restRequest));
-        List<MatcherConfiguration> matcherConfigArray = matcherConfigurationReader.createConfig();
-        List<MatcherConfiguration> matcherConfiguration = matching(restRequest, matcherConfigArray, Optional.empty());
+        log.trace(MessageFormat.format("findResponse() ", restRequest));
+        List<MatcherConfiguration> matcherConfigList = matcherConfigurationReader.createConfig();
+        List<MatcherConfiguration> matcherConfiguration = matching(restRequest, matcherConfigList, Optional.of(1));
 
         if (matcherConfiguration.size() == 1) {
-            return getMatchedResult(matcherConfiguration.get(0));
+            return matcherConfiguration.get(0).getResponse();
         }
-        if (matcherConfiguration.size() == 0) {
-            log.warn("Found no matching configuration");
-        } else {
-            log.warn("Multiple configurations matched");
+        if (matcherConfiguration.size() != 0) {
+            log.warn(MessageFormat.format("Multiple ({0}) configurations matched, the first wins", matcherConfiguration.size()));
+            return matcherConfiguration.get(0).getResponse();
         }
-        log.warn("No suitable matcher found, so a default response will be returned");
+        log.warn("Found no matching configuration, so a default response will be returned");
         return defaultResponse;
     }
 
@@ -62,37 +62,41 @@ public class RequestMatcherService {
     private List<MatcherConfiguration> matching(RestRequest restRequest, List<MatcherConfiguration> matcherConfiguration,
                                                 Optional<Integer> limit) {
         List<MatcherConfiguration> positivMatcherList = new ArrayList<>();
-        log.info("matching()");
-        log.debug("matcherConfiguration.size : " + matcherConfiguration.size());
+        log.trace("matching()");
         RequestMatcher[] fullMatcherList = {new MethodMatcher(), new UrlMatcher(), new HeaderMatcher(), new BodyMatcher()};
-        String matchResultMessage;
-        for (MatcherConfiguration matcherConfig : matcherConfiguration) {
-            matchResultMessage = "[" + matcherConfig.getName() + "]";
+        StringBuilder matchResultMessage;
+        Boolean isConfigMatching;
+        outerLoop: for (MatcherConfiguration matcherConfig : matcherConfiguration) {
+            isConfigMatching = null;
+            matchResultMessage = new StringBuilder("[" + matcherConfig.getName() + "]");
+            log.info(matchResultMessage.toString());
             for (RequestMatcher matcher : fullMatcherList) {
-                Optional<Boolean> matcherResult = matcher.matches(restRequest, matcherConfig);
-                if (matcherResult.isPresent() && matcherResult.get()) {
-                    matchResultMessage += " " + matcher.getCheckedElementName() + ": " + matcherResult + ",";
-                    if (!positivMatcherList.contains(matcherConfig)) {
-                        positivMatcherList.add(matcherConfig);
+                Optional<Boolean> isMatching = matcher.matches(restRequest, matcherConfig);
+                if (isMatching.isPresent()) {
+                    matchResultMessage.append(" " + matcher.getCheckedElementName() + ": " + isMatching.get() + ",");
+                    if (isConfigMatching == null && isMatching.get()) {
+                        isConfigMatching = true;
                     }
-                    if (limit.isPresent() && positivMatcherList.size() >= limit.get()) {
-                        break;
+                    if (isConfigMatching != null && !isMatching.get()) {
+                        isConfigMatching = false;
                     }
-                } else {
-                    log.debug(matcher.getClass().getSimpleName() + " not matching.");
                 }
             }
-            log.info(matchResultMessage);
+            if (isConfigMatching != null && isConfigMatching) {
+                if (!positivMatcherList.contains(matcherConfig)) {
+                    positivMatcherList.add(matcherConfig);
+                    if (matchResultMessage.charAt(matchResultMessage.length() - 1) == ',') {
+                        matchResultMessage = matchResultMessage.deleteCharAt(matchResultMessage.length() - 1);
+                    }
+                    matchResultMessage.append("   =>   Used in response");
+                }
+            }
+            log.info(matchResultMessage.toString());
+            if (limit.isPresent() && positivMatcherList.size() >= limit.get()) {
+                break outerLoop;
+            }
         }
         return positivMatcherList;
-    }
-
-    private ResponseMatcherConfig getMatchedResult(MatcherConfiguration matcherConfig) {
-        log.info("[matched.details] " + MessageFormat.format("method={0}, urlRegEx={1}, bodyRegExMatch={2}", matcherConfig.getRequest().getMethod(),
-                matcherConfig.getRequest().getUrlRegEx(), matcherConfig.getRequest().getBodyRegEx()));
-        log.info("[response.file] " + matcherConfig.getResponse().getFilename());
-        String fileContent = matcherConfigurationReader.readResponseFile(matcherConfig.getResponse().getFilename());
-        return new ResponseMatcherConfig(matcherConfig.getResponse().getStatusCode(), fileContent, null);
     }
 
     /**
