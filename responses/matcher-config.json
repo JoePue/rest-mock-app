@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Login-Matcher",
+    "description": "Define a mocked response for login requests",
+    "request": {
+      "method": "POST",
+      "urlRegEx": "/v1/login.*",
+      "bodyRegEx": ".*",
+      "bodyContains": "username"
+    },
+    "response": {
+      "statusCode": 200,
+      "filename": "/api/login.json"
+    }
+  },
+  {
+    "name": "Default-Matcher",
+    "description": "Default Matcher/Response",
+    "request": {
+    },
+    "response": {
+      "statusCode": 200,
+      "filename": "/default.txt"
+    }
+  }
+]
