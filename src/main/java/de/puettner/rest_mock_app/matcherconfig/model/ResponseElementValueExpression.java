@@ -9,10 +9,10 @@ public class ResponseElementValueExpression extends ElementValueExpression {
     }
 
     @Override
-    public String getContent() {
+    public String getValue() {
         if (super.isRegularExpression) {
             throw new AppException("A regular expression as body is invalid.  expression: " + expression);
         }
-        return super.getContent();
+        return super.getValue();
     }
 }

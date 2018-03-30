@@ -15,25 +15,30 @@ import java.util.Optional;
 @RestController
 public class MatcherRestController {
 
-	private final MatcherConfigurationReader configReader;
-	private final RequestMatcherService matcher;
+    private final MatcherConfigurationReader configReader;
+    private final RequestMatcherService matcher;
 
-	@Autowired
-	public MatcherRestController(MatcherConfigurationReader matcherConfigurationReader, RequestMatcherService requestMatcher) {
-		this.configReader = matcherConfigurationReader;
-		this.matcher = requestMatcher;
-	}
+    @Autowired
+    public MatcherRestController(MatcherConfigurationReader matcherConfigurationReader, RequestMatcherService requestMatcher) {
+        this.configReader = matcherConfigurationReader;
+        this.matcher = requestMatcher;
+    }
 
-	@RequestMapping(method = RequestMethod.GET, path = "/matcher/config")
-	public @ResponseBody List<MatcherConfiguration> getAll() {
-		return configReader.createConfig();
-	}
+    @RequestMapping(method = RequestMethod.GET, path = "/matcher/config")
+    public
+    @ResponseBody
+    List<MatcherConfiguration> getAll() {
+        return configReader.createConfig();
+    }
 
-	@RequestMapping(method = RequestMethod.POST, path = "/matching")
-	public @ResponseBody List<MatcherConfiguration> matching(@RequestBody String body, HttpServletRequest request) {
-		RestRequest restRequest = RestRequest.builder().method(RequestMethod.POST).body(Optional.of(body)).url(request.getRequestURI()).build();
+    @RequestMapping(method = RequestMethod.POST, path = "/matching")
+    public
+    @ResponseBody
+    List<MatcherConfiguration> matching(@RequestBody String body, HttpServletRequest request) {
+        RestRequest restRequest = RestRequest.builder().method(RequestMethod.POST).body(Optional.of(body)).url(request.getRequestURI())
+                .build();
 
-		return Arrays.asList(matcher.matchedRules(restRequest));
-	}
+        return Arrays.asList(matcher.matchedRules(restRequest));
+    }
 
 }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface RequestMatcher {
     Optional<Boolean> matches(RestRequest restRequest, MatcherConfiguration matcherConfig);
+
     default String getCheckedElementName() {
         return "**MissingMatcherName**";
     }

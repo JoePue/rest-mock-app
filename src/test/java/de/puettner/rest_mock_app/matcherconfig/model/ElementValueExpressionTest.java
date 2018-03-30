@@ -9,15 +9,15 @@ import static org.junit.Assert.*;
 
 public class ElementValueExpressionTest {
 
-    public static final String RESPONSE_FILE_BASE_DIR = "./src/test/resources".replace("/", File.separator);
+    static final String RESPONSE_FILE_BASE_DIR = "./src/test/resources".replace("/", File.separator);
 
     @Test
-    public void constructWithNullValue(){
+    public void constructWithNullValue() {
         assertInvalidElementValueExpression(null);
     }
 
     @Test
-    public void constructWithEmptyValue(){
+    public void constructWithEmptyValue() {
         assertInvalidElementValueExpression("");
     }
 
@@ -30,11 +30,13 @@ public class ElementValueExpressionTest {
         try {
             actual.getFile();
             assertFalse("Should not reached.", true);
-        }catch (AppException e){}
+        } catch (AppException e) {
+        }
         try {
             actual.getRegEx();
             assertFalse("Should not reached.", true);
-        }catch (AppException e){}
+        } catch (AppException e) {
+        }
     }
 
     @Test(expected = AppException.class)
@@ -48,41 +50,42 @@ public class ElementValueExpressionTest {
     }
 
     @Test
-    public void constructWithRegEx(){
+    public void constructWithRegEx() {
         ElementValueExpression actual = new ElementValueExpression("regex::.*");
         actual.init(RESPONSE_FILE_BASE_DIR);
         assertFalse(actual.isFileExpression());
         assertTrue(actual.isRegularExpression());
         assertFalse(actual.isPlainExpression());
         assertNotNull(actual.getRegEx());
-        actual.getContent();
+        actual.getValue();
     }
 
     @Test
-    public void constructWithPlainString(){
+    public void constructWithPlainString() {
         ElementValueExpression actual = new ElementValueExpression("plain");
         actual.init(RESPONSE_FILE_BASE_DIR);
         assertFalse(actual.isFileExpression());
         assertFalse(actual.isRegularExpression());
         assertTrue(actual.isPlainExpression());
-        assertEquals("plain", actual.getContent());
+        assertEquals("plain", actual.getValue());
         try {
             actual.getRegEx();
             assertFalse("Should not reached.", true);
-        }catch (AppException e){}
+        } catch (AppException e) {
+        }
     }
 
     @Test
-    public void constructWithFile(){
+    public void constructWithFile() {
         String[] testFilenames = {"file::testFile.txt", "file::/testFile.txt"};
-        for (String testFilename :  testFilenames) {
+        for (String testFilename : testFilenames) {
             ElementValueExpression actual = new ElementValueExpression(testFilename);
             actual.init(RESPONSE_FILE_BASE_DIR);
             assertNotNull(actual.getFile());
             assertTrue(actual.isFileExpression());
             assertFalse(actual.isRegularExpression());
             assertFalse(actual.isPlainExpression());
-            assertEquals("Content of testFile.txt", actual.getContent());
+            assertEquals("Content of testFile.txt", actual.getValue());
             try {
                 actual.getRegEx();
                 assertFalse("Should not reached.", true);

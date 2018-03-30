@@ -55,7 +55,7 @@ public class ConfigurationValidator {
                 throw new AppException("Invalid JSON : Empty response object");
             }
             if (item.getRequest().getMethod() != null && item.getRequest().getMethod().isPlainExpression()) {
-                validateHttpMethod(item.getRequest().getMethod().getContent());
+                validateHttpMethod(item.getRequest().getMethod().getValue());
             }
             validateHttpStatusCode(item.getResponse().getStatusCode());
             item.getResponse().getBody().validate();

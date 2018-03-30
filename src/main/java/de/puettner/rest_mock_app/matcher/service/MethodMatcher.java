@@ -15,6 +15,7 @@ public class MethodMatcher implements RequestMatcher {
         }
         return Optional.empty();
     }
+
     public String getCheckedElementName() {
         return "method";
     }

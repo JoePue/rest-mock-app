@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -51,7 +54,7 @@ public class AppRestController {
     public ResponseEntity<String> delete(@RequestBody String body, HttpServletRequest request) {
         return findMatchingResponse(request, body);
     }
-    
+
     private ResponseEntity<String> findMatchingResponse(HttpServletRequest request, String body) {
         log.info("Incoming request");
         String restOfTheUrl = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
@@ -59,11 +62,26 @@ public class AppRestController {
             restOfTheUrl = restOfTheUrl + "?" + request.getQueryString();
         }
         RequestMethod method = RequestMethod.valueOf(request.getMethod());
-        RestRequest restRequest = RestRequest.builder().method(method).body(Optional.ofNullable(body)).url(restOfTheUrl).build();
+
+        RestRequest restRequest = RestRequest.builder().method(method).body(Optional.ofNullable(body)).url(restOfTheUrl).header
+                (createHeaderList(request)).build();
 
         ResponseMatcherConfig result = matcher.findResponse(restRequest);
-        
-        return ResponseEntity.status(result.getStatusCode()).body(result.getBody().getContent());
+
+        return ResponseEntity.status(result.getStatusCode()).body(result.getBody().getValue());
+    }
+
+    private Optional<Map<String, String>> createHeaderList(final HttpServletRequest request) {
+        Enumeration<String> names = request.getHeaderNames();
+        Map<String, String> headers = new HashMap<>();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement();
+            headers.put(name, request.getHeader(name));
+        }
+        if (headers.size() == 0) {
+            return Optional.empty();
+        }
+        return Optional.of(headers);
     }
 
 }

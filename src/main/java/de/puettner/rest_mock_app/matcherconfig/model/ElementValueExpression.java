@@ -19,11 +19,12 @@ public class ElementValueExpression {
     public static final String REGEX_PREFIX = "regex::";
     public static final String FILE_PREFIX = "file::";
 
+    /** Possible schemas for an expressen are '[value]' and '[operator]::[value]' */
     protected final String expression;
     protected String value;
     protected boolean isFileExpression = false;
     protected boolean isRegularExpression = false;
-    protected boolean isPlainExpression = false;
+    private boolean isPlainExpression = false;
     private File file;
     private Pattern pattern;
 
@@ -51,12 +52,19 @@ public class ElementValueExpression {
 
     public static ElementValueExpression buildByString(String string) { return new ElementValueExpression(string).init();}
 
-    private ElementValueExpression init() {
+    public ElementValueExpression init() {
+        if (isFileExpression) {
+            throw new AppException("This init method is not allowed to use for file expressions.");
+        }
         this.init(null);
         return this;
     }
 
     public ElementValueExpression init(String responseFileBaseDir) {
+        return init(responseFileBaseDir, false);
+    }
+
+    public ElementValueExpression init(String responseFileBaseDir, boolean headerNameToLowerCase) {
         if (isFileExpression) {
             if (isBlank(responseFileBaseDir)) {
                 throw new AppException("Invalid directory for responseFileBaseDir");
@@ -64,7 +72,7 @@ public class ElementValueExpression {
             this.value = expression.trim().substring(6);
             String filename = responseFileBaseDir;
             if (value.startsWith("/") || value.startsWith("\\")) {
-                value =  value.substring(1);
+                value = value.substring(1);
             }
             filename += File.separatorChar + value;
             file = new File(filename);
@@ -74,6 +82,9 @@ public class ElementValueExpression {
         } else if (isRegularExpression) {
             this.value = expression.substring(7);
             pattern = Pattern.compile(value);
+        }
+        if (headerNameToLowerCase) {
+            this.value = this.value.toLowerCase();
         }
         return this;
     }
@@ -98,10 +109,11 @@ public class ElementValueExpression {
 
     public File getFile() {
         if (!isFileExpression) {
-            throw new AppException("A file is not available for " + expression);
+            throw new AppException(MessageFormat.format("A file is not available for ''{0}''", expression));
         }
         return file;
     }
+
     public Pattern getRegEx() {
         if (!isRegularExpression) {
             throw new AppException("A regular expression is not available for " + expression);
@@ -109,7 +121,7 @@ public class ElementValueExpression {
         return pattern;
     }
 
-    public String getContent() {
+    public String getValue() {
         if (isFileExpression) {
             try {
                 return FileUtils.readFileToString(file, Charset.forName("UTF-8"));

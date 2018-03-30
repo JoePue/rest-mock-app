@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class ResponseElementValueExpressionTest {
 
     @Test
-    public void constructWithRegEx(){
+    public void constructWithRegEx() {
         ElementValueExpression actual = new ResponseElementValueExpression("regex::.*");
         actual.init(RESPONSE_FILE_BASE_DIR);
         assertFalse(actual.isFileExpression());
@@ -17,8 +17,9 @@ public class ResponseElementValueExpressionTest {
         assertFalse(actual.isPlainExpression());
         assertNotNull(actual.getRegEx());
         try {
-            actual.getContent();
+            actual.getValue();
             assertFalse("Should not reached.", true);
-        }catch (AppException e){}
+        } catch (AppException e) {
+        }
     }
 }

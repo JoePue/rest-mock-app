@@ -16,13 +16,17 @@
     "name": "Login-Matcher",
     "description": "Define a mocked response for login requests",
     "request": {
-      "method": "POST",             # If request with HTTP method is equal to 'POST'
+      "method": "POST",             # If http method of request is equal to 'POST'
       "url": "regex::/v1/login.*"   # ... and incomming URL is matching
-      "body": ".*",                 # ... and incomming body is matching
+      "body": "regex::.*",          # ... and incomming body is matching
+      "header": {
+        "name": "myHeaderName",     # ... and incomming header name is matching
+        "value": "regex::.*myHeaderValue.*" # ... and incomming header value is matching
+       }
     },
     "response": {
       "statusCode": 200,              # ... then return a HTTP Status code 200
-      "body": "file::/api/login.json" # ... and return content of file as body
+      "body": "file::/api/login.json" # ... and return file content as body
     }
   }
 ```

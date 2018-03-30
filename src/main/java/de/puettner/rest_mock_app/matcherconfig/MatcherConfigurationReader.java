@@ -25,16 +25,16 @@ public class MatcherConfigurationReader {
      * C'tor
      */
     @Autowired
-    public MatcherConfigurationReader(@Value("${app.matcher.configuration.file}") String matchingConfigurationFilename,
-                                      @Value("${app.response.file.basedir}") String responseFileBaseDir) {
+    public MatcherConfigurationReader(@Value("${app.matcher.configuration.file}") String matchingConfigurationFilename, @Value("${app" +
+            ".response.file.basedir}") String responseFileBaseDir) {
         this.matchingConfigurationFilename = matchingConfigurationFilename;
         this.responseFileBaseDir = responseFileBaseDir;
     }
 
     /**
-     * Konfig erstellen
+     * Creates a configuration.
      *
-     * @return
+     * @return Loaded configuration
      */
     public List<MatcherConfiguration> createConfig() {
         if (null == this.responseFileBaseDir || responseFileBaseDir.isEmpty()) {
@@ -70,18 +70,23 @@ public class MatcherConfigurationReader {
             if (configItem.getResponse().getBody() == null) {
                 throw new AppException("Invalid JSON : Empty response.body");
             }
-            if (requestConfig.getHeader() != null && requestConfig.getHeader().getName() == null && requestConfig.getHeader().getValue()== null) {
-                throw new AppException("Invalid JSON : At the same time header name and header value can't be null.");
+            if (requestConfig.getHeader() != null) {
+                if (requestConfig.getHeader().getName() == null || requestConfig.getHeader().getValue() == null) {
+                    throw new AppException("Invalid JSON : Header name and header value must be set.");
+                } else {
+                    requestConfig.getHeader().getName().init(responseFileBaseDir, true);
+                    requestConfig.getHeader().getValue().init();
+                }
             }
 
             if (requestConfig.getUrl() != null) {
-                requestConfig.getUrl().init(responseFileBaseDir);
+                requestConfig.getUrl().init();
             }
             if (requestConfig.getBody() != null) {
                 requestConfig.getBody().init(responseFileBaseDir);
             }
             if (requestConfig.getMethod() != null) {
-                requestConfig.getMethod().init(responseFileBaseDir);
+                requestConfig.getMethod().init();
             }
             configItem.getResponse().getBody().init(responseFileBaseDir);
         }

@@ -14,11 +14,13 @@ public class BodyMatcher implements RequestMatcher {
         // Regular Expressions werden nur angewendet wenn sie nicht null sind und ihr Prüfwert ebenfalls ungleich null ist
         if (matcherConfig.getRequest().getBody() != null && restRequest.getBody().isPresent()) {
             boolean matched = matcherConfig.getRequest().getBody().matches(restRequest.getBody().get());
-            log.debug("Matching '" + matcherConfig.getRequest().getBody().getContent() + "' with '" + restRequest.getBody().get() + "' ? " + matched);
+            log.debug("Matching '" + matcherConfig.getRequest().getBody().getValue() + "' with '" + restRequest.getBody().get() + "' ? " +
+                    "" + matched);
             return Optional.of(matched);
         }
         return Optional.empty();
     }
+
     public String getCheckedElementName() {
         return "body";
     }
