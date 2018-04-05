@@ -10,7 +10,7 @@
 
 ## Configuration
 * By default the property "app.response.file.basedir" points to the directory "./responses" where you can find a file named "matcher-config.json", here you can define all your mocked responses.
-* The configuration consist of three parts common configuration attributes, a request object and a response object. A request object defines rules when this configuration is applied to incomming requests. The response object defines the response behavior for matched requests.
+* The configuration consist of three parts common configuration attributes, a request object and a response object. A request object defines rules when this configuration is applied to incoming requests. The response object defines the response behavior for matched requests.
 ```text
   {
     "name": "Login-Matcher",
@@ -25,8 +25,9 @@
        }
     },
     "response": {
-      "statusCode": 200,              # ... then return a HTTP Status code 200
-      "body": "file::/api/login.json" # ... and return file content as body
+      "statusCode": 200,                # ... then return a HTTP Status code 200
+      "body": "file::/api/login.json"   # ... and return file content as body
+      "contentType": "application/json" # ... and set value of content-type header
     }
   }
 ```

@@ -17,12 +17,16 @@ public class AppException extends RuntimeException {
         return errors;
     }
 
+    public AppException(String message) {
+        super(message);
+    }
+
     public AppException(String message, Exception e) {
         super(message, e);
     }
 
-    public AppException(String message, Object... args) {
-        super(MessageFormat.format(message, args));
+    public AppException(String message, Exception e, Object... args) {
+        super(MessageFormat.format(message, args), e);
     }
 
 }

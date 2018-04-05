@@ -20,7 +20,8 @@
     },
     "response": {
       "statusCode": 200,
-      "body": "file::/api/login.json"
+      "body": "file::/api/login.json",
+      "contentType" : "application/json"
     }
   },
   {
@@ -43,7 +44,8 @@
     },
     "response": {
       "statusCode": 200,
-      "body": "file::/default.txt"
+      "body": "file::/default.txt",
+      "contentType" : "application/text"
     }
   }
 ]

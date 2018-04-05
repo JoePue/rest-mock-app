@@ -3,13 +3,12 @@ package de.puettner.rest_mock_app.matcherconfig.model;
 import de.puettner.rest_mock_app.exception.AppException;
 import org.junit.Test;
 
-import java.io.File;
-
+import static de.puettner.rest_mock_app.TestConstants.TESTFILE_TXT;
+import static de.puettner.rest_mock_app.TestConstants.TEST_RESOURCES_DIR;
+import static de.puettner.rest_mock_app.TestConstants.TEST_RESPONSES_DIR;
 import static org.junit.Assert.*;
 
 public class ValueExpressionTest {
-
-    static final String RESPONSE_FILE_BASE_DIR = "./src/test/resources".replace("/", File.separator);
 
     @Test
     public void constructWithNullValue() {
@@ -23,7 +22,7 @@ public class ValueExpressionTest {
 
     private void assertInvalidElementValueExpression(String value) {
         ValueExpression actual = new ValueExpression(value);
-        actual.init(RESPONSE_FILE_BASE_DIR);
+        actual.init(TEST_RESOURCES_DIR);
         assertFalse(actual.isFileExpression());
         assertFalse(actual.isRegularExpression());
         assertFalse(actual.isPlainExpression());
@@ -52,7 +51,7 @@ public class ValueExpressionTest {
     @Test
     public void constructWithRegEx() {
         ValueExpression actual = new ValueExpression("regex::.*");
-        actual.init(RESPONSE_FILE_BASE_DIR);
+        actual.init(TEST_RESOURCES_DIR);
         assertFalse(actual.isFileExpression());
         assertTrue(actual.isRegularExpression());
         assertFalse(actual.isPlainExpression());
@@ -63,7 +62,7 @@ public class ValueExpressionTest {
     @Test
     public void constructWithPlainString() {
         ValueExpression actual = new ValueExpression("plain");
-        actual.init(RESPONSE_FILE_BASE_DIR);
+        actual.init(TEST_RESOURCES_DIR);
         assertFalse(actual.isFileExpression());
         assertFalse(actual.isRegularExpression());
         assertTrue(actual.isPlainExpression());
@@ -77,10 +76,10 @@ public class ValueExpressionTest {
 
     @Test
     public void constructWithFile() {
-        String[] testFilenames = {"file::testFile.txt", "file::/testFile.txt"};
+        String[] testFilenames = {"file::" + TESTFILE_TXT, "file::/" + TESTFILE_TXT};
         for (String testFilename : testFilenames) {
             ValueExpression actual = new ValueExpression(testFilename);
-            actual.init(RESPONSE_FILE_BASE_DIR);
+            actual.init(TEST_RESPONSES_DIR);
             assertNotNull(actual.getFile());
             assertTrue(actual.isFileExpression());
             assertFalse(actual.isRegularExpression());
