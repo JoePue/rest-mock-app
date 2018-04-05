@@ -7,6 +7,7 @@ import de.puettner.rest_mock_app.matcherconfig.model.ResponseValueExpression;
 import de.puettner.rest_mock_app.matcherconfig.model.ResponseConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -18,7 +19,8 @@ import java.util.Optional;
 @Slf4j
 public class RequestMatcherService {
 
-    private final ResponseConfiguration defaultConfig = new ResponseConfiguration(500, new ResponseValueExpression("No suitable matcher found."));
+    private final ResponseConfiguration defaultConfig = new ResponseConfiguration(500,
+            new ResponseValueExpression("No suitable matcher found."), MediaType.TEXT_PLAIN);
     private final AppConfigurationBuilder matcherConfigurationReader;
 
     /**

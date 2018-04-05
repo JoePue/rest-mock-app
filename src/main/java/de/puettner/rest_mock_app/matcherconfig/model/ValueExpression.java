@@ -129,6 +129,10 @@ public class ValueExpression {
         return pattern;
     }
 
+    public String getExpression() {
+        return this.expression;
+    }
+
     public String getValue() {
         if (isFileExpression) {
             try {

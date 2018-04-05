@@ -68,7 +68,7 @@ public class AnyRequestRestController {
 
         ResponseConfiguration result = matcherService.findResponse(restRequest);
 
-        return ResponseEntity.status(result.getStatusCode()).body(result.getBody().getValue());
+        return ResponseEntity.status(result.getStatusCode()).contentType(result.getContentType()).body(result.getBody().getValue());
     }
 
     private Optional<Map<String, String>> createHeaderList(final HttpServletRequest request) {
