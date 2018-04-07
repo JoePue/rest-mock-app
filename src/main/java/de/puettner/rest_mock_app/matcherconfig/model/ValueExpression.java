@@ -14,10 +14,12 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 /**
- * Some configuration values can express special meanings if the have a predefined prefix
+ * Some configuration values can express special meanings if the have a predefined prefix <br>
+ * <code>
  * {"key" : "value"}            => isPlainExpression = true <br>
  * {"key" : "file::value"}      => isFileExpression = true <br>
  * {"key" : "regex::value"}     => isRegularExpression = true <br>
+ * </code>
  */
 @Slf4j
 public class ValueExpression {

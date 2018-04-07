@@ -5,8 +5,8 @@
 	<artifactId>rest-mock-app</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0.0</version>
-	<name>demo</name>
-	<url>http://maven.apache.org</url>
+	<name>RestMockApp</name>
+	<url>https://github.com/JoePue/rest-mock-app</url>
 
 	<description>Mock your REST requests with a local spring boot service.</description>
 
@@ -92,6 +92,5 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
-		<finalName>restmock</finalName>
 	</build>
 </project>
