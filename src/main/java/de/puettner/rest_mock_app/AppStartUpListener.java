@@ -1,6 +1,6 @@
 package de.puettner.rest_mock_app;
 
-import de.puettner.rest_mock_app.matcherconfig.MatcherConfigurationReader;
+import de.puettner.rest_mock_app.matcherconfig.AppConfigurationBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -9,17 +9,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class ApplicationStartUpListener implements ApplicationListener<ContextRefreshedEvent> {
+public class AppStartUpListener implements ApplicationListener<ContextRefreshedEvent> {
 
-    private final MatcherConfigurationReader reader;
+    private final AppConfigurationBuilder reader;
 
     @Autowired
-    public ApplicationStartUpListener(MatcherConfigurationReader reader) {
+    public AppStartUpListener(AppConfigurationBuilder reader) {
         this.reader = reader;
     }
 
     @Override public void onApplicationEvent(ContextRefreshedEvent event) {
         log.debug("onApplicationEvent");
-        reader.createConfig();
+        reader.build();
     }
 }

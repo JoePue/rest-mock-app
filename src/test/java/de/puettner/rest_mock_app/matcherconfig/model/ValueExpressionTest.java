@@ -7,7 +7,7 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-public class ElementValueExpressionTest {
+public class ValueExpressionTest {
 
     static final String RESPONSE_FILE_BASE_DIR = "./src/test/resources".replace("/", File.separator);
 
@@ -22,7 +22,7 @@ public class ElementValueExpressionTest {
     }
 
     private void assertInvalidElementValueExpression(String value) {
-        ElementValueExpression actual = new ElementValueExpression(value);
+        ValueExpression actual = new ValueExpression(value);
         actual.init(RESPONSE_FILE_BASE_DIR);
         assertFalse(actual.isFileExpression());
         assertFalse(actual.isRegularExpression());
@@ -41,17 +41,17 @@ public class ElementValueExpressionTest {
 
     @Test(expected = AppException.class)
     public void initWithNullString() {
-        ElementValueExpression.buildByFile("plain", null);
+        ValueExpression.buildByFile("plain", null);
     }
 
     @Test(expected = AppException.class)
     public void initWithEmptyString() {
-        ElementValueExpression.buildByFile("plain", "");
+        ValueExpression.buildByFile("plain", "");
     }
 
     @Test
     public void constructWithRegEx() {
-        ElementValueExpression actual = new ElementValueExpression("regex::.*");
+        ValueExpression actual = new ValueExpression("regex::.*");
         actual.init(RESPONSE_FILE_BASE_DIR);
         assertFalse(actual.isFileExpression());
         assertTrue(actual.isRegularExpression());
@@ -62,7 +62,7 @@ public class ElementValueExpressionTest {
 
     @Test
     public void constructWithPlainString() {
-        ElementValueExpression actual = new ElementValueExpression("plain");
+        ValueExpression actual = new ValueExpression("plain");
         actual.init(RESPONSE_FILE_BASE_DIR);
         assertFalse(actual.isFileExpression());
         assertFalse(actual.isRegularExpression());
@@ -79,7 +79,7 @@ public class ElementValueExpressionTest {
     public void constructWithFile() {
         String[] testFilenames = {"file::testFile.txt", "file::/testFile.txt"};
         for (String testFilename : testFilenames) {
-            ElementValueExpression actual = new ElementValueExpression(testFilename);
+            ValueExpression actual = new ValueExpression(testFilename);
             actual.init(RESPONSE_FILE_BASE_DIR);
             assertNotNull(actual.getFile());
             assertTrue(actual.isFileExpression());

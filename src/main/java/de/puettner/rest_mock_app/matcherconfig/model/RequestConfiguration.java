@@ -7,15 +7,15 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestMatcherConfig {
+public class RequestConfiguration {
 
     /** Null is ok, but not empty */
-    private ElementValueExpression method;
+    private ValueExpression method;
     /** Null is ok, but not empty */
-    private ElementValueExpression url;
+    private ValueExpression url;
     /** Null is ok, but not empty */
-    private HeaderMatcherConfig header;
+    private HeaderConfiguration header;
     /** Null is ok, but not empty */
-    private ElementValueExpression body;
+    private ValueExpression body;
 
 }

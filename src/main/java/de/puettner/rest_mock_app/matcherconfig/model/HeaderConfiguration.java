@@ -9,11 +9,12 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HeaderMatcherConfig {
+public class HeaderConfiguration {
+
     /** Not Null */
     @NotNull
-    private ElementValueExpression name;
+    private ValueExpression name;
     /** Not Null */
     @NotNull
-    private ElementValueExpression value;
+    private ValueExpression value;
 }

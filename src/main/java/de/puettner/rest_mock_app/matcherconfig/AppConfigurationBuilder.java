@@ -3,8 +3,8 @@ package de.puettner.rest_mock_app.matcherconfig;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.puettner.rest_mock_app.exception.AppException;
-import de.puettner.rest_mock_app.matcherconfig.model.MatcherConfiguration;
-import de.puettner.rest_mock_app.matcherconfig.model.RequestMatcherConfig;
+import de.puettner.rest_mock_app.matcherconfig.model.AppConfiguration;
+import de.puettner.rest_mock_app.matcherconfig.model.RequestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.List;
 
 @Component
-public class MatcherConfigurationReader {
+public class AppConfigurationBuilder {
 
     private final String matchingConfigurationFilename;
 
@@ -25,39 +25,39 @@ public class MatcherConfigurationReader {
      * C'tor
      */
     @Autowired
-    public MatcherConfigurationReader(@Value("${app.matcher.configuration.file}") String matchingConfigurationFilename, @Value("${app" +
-            ".response.file.basedir}") String responseFileBaseDir) {
+    public AppConfigurationBuilder(@Value("${app.matcher.configuration.file}") String matchingConfigurationFilename,
+                                   @Value("${app.response.file.basedir}") String responseFileBaseDir) {
         this.matchingConfigurationFilename = matchingConfigurationFilename;
         this.responseFileBaseDir = responseFileBaseDir;
     }
 
     /**
-     * Creates a configuration.
+     * Creates a new configuration.
      *
      * @return Loaded configuration
      */
-    public List<MatcherConfiguration> createConfig() {
+    public List<AppConfiguration> build() {
         if (null == this.responseFileBaseDir || responseFileBaseDir.isEmpty()) {
             throw new AppException("responseFileDir is invalid");
         }
-        ConfigurationValidator.validateDir(responseFileBaseDir);
+        AppConfigurationValidator.validateDir(responseFileBaseDir);
         return createMatcherConfiguration();
     }
 
-    private List<MatcherConfiguration> createMatcherConfiguration() {
+    private List<AppConfiguration> createMatcherConfiguration() {
         File file = new File(responseFileBaseDir + File.separator + matchingConfigurationFilename);
-        ConfigurationValidator.validateFile(file);
-        List<MatcherConfiguration> matcherConfiguration;
+        AppConfigurationValidator.validateFile(file);
+        List<AppConfiguration> appConfiguration;
         try {
-            matcherConfiguration = om.readValue(file, new TypeReference<List<MatcherConfiguration>>() {});
+            appConfiguration = om.readValue(file, new TypeReference<List<AppConfiguration>>() {});
         } catch (Exception e) {
             throw new AppException("Invalid JSON file : " + file, e);
         }
-        if (matcherConfiguration == null) {
+        if (appConfiguration == null) {
             throw new AppException("Invalid JSON : Empty matcher object");
         }
-        for (MatcherConfiguration configItem : matcherConfiguration) {
-            RequestMatcherConfig requestConfig = configItem.getRequest();
+        for (AppConfiguration configItem : appConfiguration) {
+            RequestConfiguration requestConfig = configItem.getRequest();
             if (configItem == null) {
                 throw new AppException("Invalid JSON : Empty matcher object");
             }
@@ -90,8 +90,8 @@ public class MatcherConfigurationReader {
             }
             configItem.getResponse().getBody().init(responseFileBaseDir);
         }
-        new ConfigurationValidator(matcherConfiguration).validate();
-        return matcherConfiguration;
+        new AppConfigurationValidator(appConfiguration).validate();
+        return appConfiguration;
     }
 
 }

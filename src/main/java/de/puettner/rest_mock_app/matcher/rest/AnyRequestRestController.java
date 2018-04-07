@@ -2,7 +2,7 @@ package de.puettner.rest_mock_app.matcher.rest;
 
 import de.puettner.rest_mock_app.matcher.model.RestRequest;
 import de.puettner.rest_mock_app.matcher.service.RequestMatcherService;
-import de.puettner.rest_mock_app.matcherconfig.model.ResponseMatcherConfig;
+import de.puettner.rest_mock_app.matcherconfig.model.ResponseConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +20,14 @@ import java.util.Optional;
 
 @RestController
 @Slf4j
-public class AppRestController {
+public class AnyRequestRestController {
 
     private static final String PATH = "/**";
-    private final RequestMatcherService matcher;
+    private final RequestMatcherService matcherService;
 
     @Autowired
-    public AppRestController(RequestMatcherService matcher) {
-        this.matcher = matcher;
+    public AnyRequestRestController(RequestMatcherService matcherService) {
+        this.matcherService = matcherService;
     }
 
     @RequestMapping(method = RequestMethod.GET, path = PATH)
@@ -66,7 +66,7 @@ public class AppRestController {
         RestRequest restRequest = RestRequest.builder().method(method).body(Optional.ofNullable(body)).url(restOfTheUrl).header
                 (createHeaderList(request)).build();
 
-        ResponseMatcherConfig result = matcher.findResponse(restRequest);
+        ResponseConfiguration result = matcherService.findResponse(restRequest);
 
         return ResponseEntity.status(result.getStatusCode()).body(result.getBody().getValue());
     }

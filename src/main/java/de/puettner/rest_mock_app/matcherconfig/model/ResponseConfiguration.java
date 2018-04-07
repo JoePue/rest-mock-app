@@ -7,9 +7,9 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @ToString
-public class ResponseMatcherConfig {
+public class ResponseConfiguration {
 
     private int statusCode;
-    private ResponseElementValueExpression body;
+    private ResponseValueExpression body;
 
 }

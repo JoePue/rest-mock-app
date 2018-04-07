@@ -1,7 +1,7 @@
 package de.puettner.rest_mock_app.matcher.service;
 
 import de.puettner.rest_mock_app.matcher.model.RestRequest;
-import de.puettner.rest_mock_app.matcherconfig.MatcherConfigurationReader;
+import de.puettner.rest_mock_app.matcherconfig.AppConfigurationBuilder;
 import de.puettner.rest_mock_app.matcherconfig.model.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,14 +19,14 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RequestMatcherServiceTest {
 
-    MatcherConfigurationReader matcherConfigurationReader;
+    AppConfigurationBuilder appConfigurationBuilder;
 
     RequestMatcherService sut;
 
-    private MatcherConfiguration matcherConfiguration = new MatcherConfiguration();
+    private AppConfiguration appConfiguration = new AppConfiguration();
     private RestRequest request;
-    private RequestMatcherConfig requestConfig;
-    private ResponseMatcherConfig responseConfig;
+    private RequestConfiguration requestConfig;
+    private ResponseConfiguration responseConfiguration;
     private UUID uuid;
 
     @Before
@@ -34,22 +34,22 @@ public class RequestMatcherServiceTest {
         uuid = UUID.randomUUID();
         this.request = RestRequest.builder().method(RequestMethod.POST).body(Optional.of("abc body_" + uuid + " def")).url("/url_" +
                 uuid).header(Optional.empty()).build();
-        requestConfig = RequestMatcherConfig.builder().build();
-        matcherConfiguration.setRequest(requestConfig);
-        responseConfig = ResponseMatcherConfig.builder().body(new ResponseElementValueExpression(uuid.toString())).build();
-        matcherConfiguration.setResponse(responseConfig);
-        this.matcherConfigurationReader = Mockito.mock(MatcherConfigurationReader.class);
-        sut = new RequestMatcherService(this.matcherConfigurationReader);
+        requestConfig = RequestConfiguration.builder().build();
+        appConfiguration.setRequest(requestConfig);
+        responseConfiguration = ResponseConfiguration.builder().body(new ResponseValueExpression(uuid.toString())).build();
+        appConfiguration.setResponse(responseConfiguration);
+        this.appConfigurationBuilder = Mockito.mock(AppConfigurationBuilder.class);
+        sut = new RequestMatcherService(this.appConfigurationBuilder);
         assertThat(sut).isNotNull();
-        when(matcherConfigurationReader.createConfig()).thenReturn(Arrays.asList(matcherConfiguration));
+        when(appConfigurationBuilder.build()).thenReturn(Arrays.asList(appConfiguration));
     }
 
     @Test
     public void findDefaultResponse() {
-        when(matcherConfigurationReader.createConfig()).thenReturn(Arrays.asList());
+        when(appConfigurationBuilder.build()).thenReturn(Arrays.asList());
         RestRequest request = RestRequest.builder().header(Optional.empty()).method(RequestMethod.GET).url("testUrl").build();
 
-        ResponseMatcherConfig actualResult = sut.findResponse(request);
+        ResponseConfiguration actualResult = sut.findResponse(request);
 
         assertThat(actualResult).isNotNull();
         assertThat(actualResult.getStatusCode()).isEqualTo(500);
@@ -59,7 +59,7 @@ public class RequestMatcherServiceTest {
 
     @Test
     public void findResponseByHttpMethod() {
-        ElementValueExpression method = ElementValueExpression.buildByString(RequestMethod.POST.toString());
+        ValueExpression method = ValueExpression.buildByString(RequestMethod.POST.toString());
         requestConfig.setMethod(method);
 
         assertTrue(method.isPlainExpression());
@@ -68,7 +68,7 @@ public class RequestMatcherServiceTest {
 
     @Test
     public void findResponseByUrl() {
-        ElementValueExpression url = new ElementValueExpression(request.getUrl());
+        ValueExpression url = new ValueExpression(request.getUrl());
         requestConfig.setUrl(url);
         requestConfig.getUrl().matches(request.getUrl());
 
@@ -78,7 +78,7 @@ public class RequestMatcherServiceTest {
 
     @Test
     public void findResponseByBodyContains() {
-        ElementValueExpression body = new ElementValueExpression(request.getBody().get());
+        ValueExpression body = new ValueExpression(request.getBody().get());
         requestConfig.setBody(body);
 
         assertTrue(body.isPlainExpression());
@@ -87,7 +87,7 @@ public class RequestMatcherServiceTest {
 
     @Test
     public void findResponseByBodyRegEx() {
-        ElementValueExpression body = ElementValueExpression.buildByRegEx(".*" + uuid.toString() + ".*");
+        ValueExpression body = ValueExpression.buildByRegEx(".*" + uuid.toString() + ".*");
         requestConfig.setBody(body);
 
         assertTrue(body.isRegularExpression());
@@ -98,12 +98,12 @@ public class RequestMatcherServiceTest {
     public void findResponseByHeaderNameAndHeaderValue() {
         String testHeader = "myHeader_" + uuid;
         String operator = "";
-        ElementValueExpression name = new ElementValueExpression(operator + testHeader);
-        ElementValueExpression value = new ElementValueExpression(operator + "myHeaderValue_" + uuid);
+        ValueExpression name = new ValueExpression(operator + testHeader);
+        ValueExpression value = new ValueExpression(operator + "myHeaderValue_" + uuid);
         Map<String, String> headers = new HashMap<>();
         headers.put(name.getValue(), value.getValue());
         this.request.setHeader(Optional.of(headers));
-        HeaderMatcherConfig header = new HeaderMatcherConfig(name, value);
+        HeaderConfiguration header = new HeaderConfiguration(name, value);
         requestConfig.setHeader(header);
 
         assertTrue(name.isPlainExpression());
@@ -114,26 +114,26 @@ public class RequestMatcherServiceTest {
     public void findResponseByHeaderNameAndHeaderValueByRegEx() {
         String testHeader = "myHeader_" + uuid;
         String operator = "regex::";
-        ElementValueExpression name = new ElementValueExpression(operator + testHeader);
+        ValueExpression name = new ValueExpression(operator + testHeader);
         name.init();
-        ElementValueExpression value = new ElementValueExpression(operator + "myHeaderValue_" + uuid);
+        ValueExpression value = new ValueExpression(operator + "myHeaderValue_" + uuid);
         value.init();
         Map<String, String> headers = new HashMap<>();
         headers.put(name.getValue(), value.getValue());
         this.request.setHeader(Optional.of(headers));
-        HeaderMatcherConfig header = new HeaderMatcherConfig(name, value);
+        HeaderConfiguration header = new HeaderConfiguration(name, value);
         requestConfig.setHeader(header);
 
         assertTrue(value.isRegularExpression());
         findResponseAndAssert();
     }
 
-    private ResponseMatcherConfig findResponseAndAssert() {
+    private ResponseConfiguration findResponseAndAssert() {
         // when
-        ResponseMatcherConfig actualResult = sut.findResponse(request);
+        ResponseConfiguration actualResult = sut.findResponse(request);
         // then
         assertThat(actualResult).isNotNull();
-        assertThat(actualResult).isEqualTo(responseConfig);
+        assertThat(actualResult).isEqualTo(responseConfiguration);
         return actualResult;
     }
 }

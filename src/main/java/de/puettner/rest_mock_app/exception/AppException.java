@@ -2,6 +2,8 @@ package de.puettner.rest_mock_app.exception;
 
 import org.springframework.validation.Errors;
 
+import java.text.MessageFormat;
+
 @SuppressWarnings("serial")
 public class AppException extends RuntimeException {
     private Errors errors;
@@ -19,7 +21,8 @@ public class AppException extends RuntimeException {
         super(message, e);
     }
 
-    public AppException(String message) {
-        super(message);
+    public AppException(String message, Object... args) {
+        super(MessageFormat.format(message, args));
     }
+
 }

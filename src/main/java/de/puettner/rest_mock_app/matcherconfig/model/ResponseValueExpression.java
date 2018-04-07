@@ -2,9 +2,9 @@ package de.puettner.rest_mock_app.matcherconfig.model;
 
 import de.puettner.rest_mock_app.exception.AppException;
 
-public class ResponseElementValueExpression extends ElementValueExpression {
+public class ResponseValueExpression extends ValueExpression {
 
-    public ResponseElementValueExpression(String expression) {
+    public ResponseValueExpression(String expression) {
         super(expression);
     }
 

@@ -7,11 +7,11 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatcherConfiguration {
+public class AppConfiguration {
 
     private String name;
     private String description;
-    private RequestMatcherConfig request;
-    private ResponseMatcherConfig response;
+    private RequestConfiguration request;
+    private ResponseConfiguration response;
 
 }

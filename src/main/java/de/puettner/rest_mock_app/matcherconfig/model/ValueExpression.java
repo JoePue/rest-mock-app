@@ -13,13 +13,19 @@ import java.util.regex.Pattern;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+/**
+ * Some configuration values can express special meanings if the have a predefined prefix
+ * {"key" : "value"}            => isPlainExpression = true <br>
+ * {"key" : "file::value"}      => isFileExpression = true <br>
+ * {"key" : "regex::value"}     => isRegularExpression = true <br>
+ */
 @Slf4j
-public class ElementValueExpression {
+public class ValueExpression {
 
     public static final String REGEX_PREFIX = "regex::";
     public static final String FILE_PREFIX = "file::";
 
-    /** Possible schemas for an expressen are '[value]' and '[operator]::[value]' */
+    /** Possible schemas for an expression are '[value]' and '[operator]::[value]' */
     protected final String expression;
     protected String value;
     protected boolean isFileExpression = false;
@@ -28,7 +34,7 @@ public class ElementValueExpression {
     private File file;
     private Pattern pattern;
 
-    public ElementValueExpression(String expression) {
+    public ValueExpression(String expression) {
         this.expression = expression;
         if (isNotBlank(expression)) {
             if (expression.startsWith(FILE_PREFIX)) {
@@ -42,17 +48,17 @@ public class ElementValueExpression {
         }
     }
 
-    public static ElementValueExpression buildByRegEx(String regex) {
-        return new ElementValueExpression(REGEX_PREFIX + regex).init();
+    public static ValueExpression buildByRegEx(String regex) {
+        return new ValueExpression(REGEX_PREFIX + regex).init();
     }
 
-    public static ElementValueExpression buildByFile(String filename, String responseFileBaseDir) {
-        return new ElementValueExpression(FILE_PREFIX + filename).init(responseFileBaseDir);
+    public static ValueExpression buildByFile(String filename, String responseFileBaseDir) {
+        return new ValueExpression(FILE_PREFIX + filename).init(responseFileBaseDir);
     }
 
-    public static ElementValueExpression buildByString(String string) { return new ElementValueExpression(string).init();}
+    public static ValueExpression buildByString(String string) { return new ValueExpression(string).init();}
 
-    public ElementValueExpression init() {
+    public ValueExpression init() {
         if (isFileExpression) {
             throw new AppException("This init method is not allowed to use for file expressions.");
         }
@@ -60,11 +66,11 @@ public class ElementValueExpression {
         return this;
     }
 
-    public ElementValueExpression init(String responseFileBaseDir) {
+    public ValueExpression init(String responseFileBaseDir) {
         return init(responseFileBaseDir, false);
     }
 
-    public ElementValueExpression init(String responseFileBaseDir, boolean headerNameToLowerCase) {
+    public ValueExpression init(String responseFileBaseDir, boolean headerNameToLowerCase) {
         if (isFileExpression) {
             if (isBlank(responseFileBaseDir)) {
                 throw new AppException("Invalid directory for responseFileBaseDir");
