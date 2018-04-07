@@ -3,7 +3,6 @@ package de.puettner.rest_mock_app.matcherconfig.model;
 import de.puettner.rest_mock_app.exception.AppException;
 import org.junit.Test;
 
-import static de.puettner.rest_mock_app.matcherconfig.model.ValueExpressionTest.RESPONSE_FILE_BASE_DIR;
 import static org.junit.Assert.*;
 
 public class ResponseValueExpressionTest {
@@ -11,7 +10,7 @@ public class ResponseValueExpressionTest {
     @Test
     public void constructWithRegEx() {
         ValueExpression actual = new ResponseValueExpression("regex::.*");
-        actual.init(RESPONSE_FILE_BASE_DIR);
+        actual.init();
         assertFalse(actual.isFileExpression());
         assertTrue(actual.isRegularExpression());
         assertFalse(actual.isPlainExpression());
